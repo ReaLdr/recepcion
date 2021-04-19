@@ -1,20 +1,22 @@
 <?php
   date_default_timezone_set('America/Mexico_City');
-  //include_once("sqlconnector.php"); //Tu conector
+  include_once("sqlconnector.php"); //Tu conector
 
-  echo json_encode($_POST);// NOS MUESTRA EL VALOR DE $_POST
+  //echo json_encode($_POST);// NOS MUESTRA EL VALOR DE $_POST
 
   //https://jsoneditoronline.org/
 
 
-  exit;
+  //exit;
 
   $usuario = filter_input(INPUT_POST, 'usuario', FILTER_SANITIZE_STRING);
   $contrasena = filter_input(INPUT_POST, 'contrasena', FILTER_SANITIZE_STRING);
 
   $usuario_correcto=false;
 
-  $query="SELECT * FROM table_name WHERE usuario = '".$usuario."' AND contrasena = '".$contrasena."';";
+  $query="SELECT * FROM scd_usuarios_imagen WHERE usuario = '".$usuario."' AND contrasena = '".$contrasena."';";
+
+
 
   $res = sqlsrv_query($conn,$query);
 
@@ -24,17 +26,15 @@
 
         # USUARIO Y CONTRASEÑA CORRECTA
 
-        $usuario_correcto=true;
-        $idusuario=$row["idusuario"];
-        $idformulas=$row["idformulas"];
-        $nombre=utf8_encode($row["nombre"]);
-        $paterno=utf8_encode($row["paterno"]);
-        $materno=utf8_encode($row["materno"]);
+        // nuevas variables de sesión
+        //id_usuario, nombre, id_distrito, estatus
 
-        $perfil=$row["perfil"];
+        $usuario_correcto=true;
+        $idusuario=$row["id_usuario"];
+        $nombre=utf8_encode($row["nombre"]);
         $id_distrito=$row["id_distrito"];
-        $estatus_cuentausuario = $row["estatus_cuentausuario"];
-        $protesta= $row["protesta1"];
+        $estatus=$row["estatus"];
+
       } else{
         $respuesta = array("success" => false, "mensaje1" => "Contraseña incorrecta");
         echo json_encode($respuesta);
@@ -51,24 +51,13 @@
       session_start();
 
       # NUESTRAS VARIABLES DE SESIÓN
-      $_SESSION["usuario"]=$usuario;
-      $_SESSION["idusuario"]=$idusuario;
-      $_SESSION["idformulas"]=$idformulas;
-      $_SESSION["nombre"]=$nombre;
-      $_SESSION["paterno"]=$paterno;
-      $_SESSION["materno"]=$materno;
-      $_SESSION["perfil"]=$perfil;
-      $_SESSION["id_distrito"]=$id_distrito;
-      $_SESSION["estatus_cuentausuario"]=$estatus_cuentausuario;
+      $usuario_correcto=true;
+      $_SESSION['id_usuario']=$row["id_usuario"];
+      $_SESSION['nombre']=utf8_encode($row["nombre"]);
+      $_SESSION['id_distrito']=$row["id_distrito"];
+      $_SESSION['estatus']=$row["estatus"];
 
-      if (is_null ($protesta)){
-        $protesta=0;
-        session_destroy();
-      } else{
-        $protesta=1;
-      }
-
-      echo json_encode(array("success" => true,"id"=>"3","mensaje1"=>$query,"mensaje2"=>"capctcha_3:", "funciona"=>$usuario_correcto,"perfil"=>$perfil));
+      echo json_encode(array("success" => true,"id"=>"3","mensaje1"=>$query,"mensaje2"=>"capctcha_3:", "funciona"=>$usuario_correcto));
 
   }
 ?>

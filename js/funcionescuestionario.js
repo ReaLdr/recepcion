@@ -6,14 +6,15 @@ function eventListeners() {
     }
 
     if (document.getElementById('table_result')) {
-        document.getElementById('table_result').addEventListener('click', fn_registrar_acuse);
+        document.getElementById('table_result').addEventListener('click', fn_received_qr);
     }
 
 }
 
 function fn_login(e) {
+
     e.preventDefault();
-    alert("Funciona");
+
     var usuario = $('#usuariotp').val();
     var contrasena = $('#contrasenatp').val();
     $.post("selectlogin.php", {
@@ -31,35 +32,35 @@ function fn_login(e) {
           $("#errormsg").html(res);
         }
     });
+
 }
 
-function fn_registrar_acuse(e){
+function fn_received_qr(e){
   e.preventDefault();
 
-  if(e.target.classList.contains('fa-check-circle') && !(e.target.classList.contains('received'))){
-    alert("cambiamos estado a checkado");
+  //fa-check-circle
 
-    let datos = new FormData();
-    datos.append('idseccion', idseccion);
+  let id_registro;
 
-    // OTRA FORMA DE HACER EL LLAMADO A AJAX
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'modelos/modelo_cambia_estado.php', true);
-    xhr.onload = function () {
-        if (this.status === 200) {
+  if(e.target.classList.contains('fa-check-circle') && !e.target.classList.contains('received')){
+      id_registro = e.target.parentElement.parentElement.id.split(':')[1];
+
+      let datos = new FormData();
+      datos.append('id_registro', id_registro);
+
+      // OTRA FORMA DE HACER EL LLAMADO A AJAX
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'modelos/modelo_cambia_estado.php', true);
+      xhr.onload = function () {
+          if (this.status === 200) {
             console.log(xhr.responseText);
             var respuesta = JSON.parse(xhr.responseText);
             if (respuesta.respuesta == "correcto") {
-                var accion = respuesta.accion;
-                if (accion == 1) {
-                    document.getElementById('distrito_' + respuesta.distrito).innerHTML = `<i class="far fa-check-circle" title="Acceso bloqueado">Acceso permitido</i>`;
-                }
-
-                if (accion == 0) {
-                    document.getElementById('distrito_' + respuesta.distrito).innerHTML = `<i class="far fa-times-circle" title="Acceso permitido">Acceso bloqueado</i>`;
-                }
+                $("#qr_"+id_registro).html(respuesta.qr);
+                $(e.target).addClass("received");
             } else {
-                alert(respuesta.mensaje);
+                alert("Ocurrió un error durante la actualización.");
             }
         }
     };
@@ -67,4 +68,25 @@ function fn_registrar_acuse(e){
     xhr.send(datos);
 
   }
+
+  if(e.target.classList.contains('fa-qrcode')){
+      id_registro = e.target.parentElement.parentElement.id.split(':')[1];
+
+      //alert(id_registro);
+        $id_link = "http://192.168.1.67/recepcion/acuse.php?cod="+id_registro;
+        //$id_link = "http://145.0.40.76/recepcion/acuse.php?cod="+id_registro;
+        //$id_link = "http://192.168.1.86/recepcion/acuse.php?cod="+id_registro;
+            $.ajax({
+                url:'generate_code.php',
+                type:'POST',
+                data: {formData:id_registro, ecc:'H', size:'9', id_link: $id_link},
+                success: function(response) {
+                    console.log(response);
+                    $(".modal-body").html(response);
+                },
+             });
+             $('#exampleModalCenter').modal('show');
+
+  }
+
 }

@@ -1,37 +1,14 @@
 <?php
 //error_reporting(0); //No suelo utilizarlo mucho pero es de ayuda
-//include_once("sqlconnector.php");//Tu conector a BD
+include_once("sqlconnector.php");//Tu conector a BD
 //include_once("cat_alcaldia.php");
-//session_start();
-date_default_timezone_set('America/Mexico_City');// ZONA HORARIA DE LA CDMX //ESTO PORQUE ALGUNAS VECES EL SERVER TIENE MAL LA HORA Y FECHA
-// $usuario=$_SESSION['usuario'];
-// $idusuario=$_SESSION['idusuario'];
-// $idformulas=$_SESSION['idformulas'];
-
-/*
-if(isset($_SESSION['idusuario'])){
-
-    $query_user="SELECT count(id) as existe FROM table_name WHERE id = '".$idformulas."'";
-
-    $user_count = sqlsrv_query($conn,$query_user);
-    while($row = sqlsrv_fetch_array($user_count)){
-        $existe=intval($row['existe']);
-    }
-
-    if($existe==0){
-
-      # NO EXISTE EN LA TABLA
-      # TRONAMOS SESIÓN Y REDIRIGIMOS (PA ASEGURAR)
-    }
-
-} else{
-    //echo "<b>No ha iniciado sesión</b>";
-    session_destroy();
-    header("Location: login.php");
-}
-*/
+include 'sesiones.php';
 
 $bienvenido = 0;
+
+//$id_distrito = $_SESsION[id_distrito];
+
+//echo json_encode($_SESSION);
 
 ?>
 
@@ -50,6 +27,10 @@ $bienvenido = 0;
 
         .received{
           color: #65b50c;
+        }
+
+        .fa-qrcode{
+            color: #6cb11e;
         }
 
         .td_center{
@@ -75,7 +56,7 @@ $bienvenido = 0;
                 <div class="row" id="top-area-datos">
                     <div class="col-md-6" id="nombre_usuario">
                         <p id="top-area-nombre">
-                            NOMBRE DEL USUARIO
+                            <?php echo $nombre; ?>
                         </p>
                     </div>
                 </div>
@@ -104,7 +85,7 @@ $bienvenido = 0;
                 <tr>
                     <th scope="row">Distrito</th>
                     <th scope="row">Casilla</th>
-                    <th scope="row">Regitrar</th>
+                    <th scope="row">Registrar</th>
                     <th scope="row">Acuse</th>
                 </tr>
             </thead>
@@ -114,8 +95,8 @@ $bienvenido = 0;
 
               #   LO SIGUIENTE ES EL CÓDIGO PHP RESULTANTE DE LA CONSULTA
 
-              /*
-              $get_info_table="SELECT * FROM table_name WHERE column = $var";
+
+              $get_info_table="SELECT * FROM scd_casillas_imagen WHERE id_distrito = $id_distrito";
               //echo $get_info_table;
 
               $res = sqlsrv_query($conn,$get_info_table);
@@ -124,47 +105,24 @@ $bienvenido = 0;
               if($valida > 0){
                 $res = sqlsrv_query($conn,$get_info_table);
                 while($row = sqlsrv_fetch_array($res)){
-                  echo '<tr>
-                          <td scope="row">'.$row['id_ditrito'].'</td>
-                          <td>'$row['casilla']'</td>
-                          <td scope="row"><i class="fas fa-check-circle cursor-pointer received" title="Ya se registró como recibido"></i></td>
+                    $id_row = $row['clave_mdc'];//Con este id realizaremos el update. TAL VEZ CAMBIE
+                  (!is_null($row['fechaQRalc']) && $row['fechaQRalc'] != "" ? $estado = "received" : $estado ="");
+                  (!is_null($row['fechaQRalc']) && $row['fechaQRalc'] != "" ? $tipo_icono = '<i class="fas fa-qrcode cursor-pointer" title="Clic para visualizar el acuse"></i>' : $tipo_icono = '<i class="fas fa-ban cursor-pointer" title="Para ver el acuse debe indicar que fue recibido"></i>');
+
+                  echo '<tr id="id:'.$id_row.'">
+                          <td scope="row">'.$row['id_distrito'].'</td>
+                          <td>'.$row['clave_mdc'].'</td>
+                          <td scope="row"><i class="fas fa-check-circle cursor-pointer '.$estado.'" title="Ya se registró como recibido"></i></td>
                           <!-- <td scope="row"><i class="far fa-check-circle cursor-pointer received"></i></td> -->
-                          <td class="td_center"><i class="fas fa-qrcode cursor-pointer received" title="Clic para visualizar el acuse"></i></td>
+                          <td class="td_center" id="qr_'.$id_row.'">'.$tipo_icono.'</td>
                         </tr>';
                 }
               } else{
                 echo '<tr><td colspan="4">Sin resultados</td></tr>';
               }
-              */
+
                ?>
-               <!-- SE COMENTA O ELIMINA (PUES ES EL RESULTADO DEL QUERY) -->
-              <tr>
-                <td scope="row">1</td>
-                <td>10B</td>
-                <td scope="row"><i class="fas fa-check-circle cursor-pointer received" title="Ya se registró como recibido"></i></td>
-                <!-- <td scope="row"><i class="far fa-check-circle cursor-pointer received"></i></td> -->
-                <td class="td_center"><i class="fas fa-qrcode cursor-pointer received" title="Clic para visualizar el acuse"></i></td>
-              </tr>
-              <tr>
-                <td scope="row">1</td>
-                <td>12B</td>
-                <td scope="row"><i class="fas fa-check-circle cursor-pointer" title="Clic para indicar que fue recibido"></i></td>
-                <td class="td_center"><i class="fas fa-ban cursor-pointer" title="Para ver el acuse debe indicar que fue recibido"></i></i></td>
-              </tr>
-              <tr>
-                <td scope="row">2</td>
-                <td>13B</td>
-                <td scope="row"><i class="fas fa-check-circle cursor-pointer received" title="Ya se registró como recibido"></i></td>
-                <!-- <td scope="row"><i class="far fa-check-circle cursor-pointer received"></i></td> -->
-                <td class="td_center"><i class="fas fa-qrcode cursor-pointer received" title="Clic para visualizar el acuse"></i></td>
-              </tr>
-              <tr>
-                <td scope="row">3</td>
-                <td>13C</td>
-                <td scope="row"><i class="fas fa-check-circle cursor-pointer" title="Clic para indicar que fue recibido"></i></td>
-                <td class="td_center"><i class="fas fa-ban cursor-pointer" title="Para ver el acuse debe indicar que fue recibido"></i></i></td>
-              </tr>
-              <!-- SE SUSTITUYE POR EL RESULTADO DEL QUERY -->
+
             </tbody>
           </table>
         </div>
@@ -214,5 +172,57 @@ $bienvenido = 0;
       include("footer.php");
     ?>
 </body>
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            Escanear ..
+        </div>
+
+      <div class="modal-body" id="qr_response" style= "text-align: center;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="btn_print">Imprimir <i class="fas fa-print"></i></button> </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+
+  $('#btn_print').on('click', function (e) {
+
+      e.preventDefault();
+
+      let qr_src = document.getElementById('qr_clave_mdc').value;
+
+      let title = qr_src.slice(0, -4);
+
+      let w = 647;
+      let h = 647;
+      let left = (screen.width/2)-(w/2);
+      let top = (screen.height/2)-(h/2);
+
+      //let mywindow = window.open('', qr_src, 'height=800,width=647');
+      let mywindow = window.open('', title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left);
+
+      mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+      mywindow.document.write('</head><body >');
+      mywindow.document.write('<center><h1>' + title  + '</h1>');
+      mywindow.document.write('<img src="codes/'+qr_src+'"></center>');
+      //mywindow.document.write('<img src="codes/821-B1.png"></center>');
+      mywindow.document.write('</body></html>');
+
+      mywindow.document.close(); // necessary for IE >= 10
+      mywindow.focus(); // necessary for IE >= 10
+
+      //mywindow.print();
+      //mywindow.close();
+
+      return true;
+
+  });
+  </script>
+</div>
 
 </html>
