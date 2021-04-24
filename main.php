@@ -206,28 +206,20 @@ $id_distrito = $_SESSION['id_distrito'];
 
       let title = qr_src.slice(0, -4);
 
-      let w = 647;
-      let h = 647;
-      let left = (screen.width/2)-(w/2);
-      let top = (screen.height/2)-(h/2);
 
-      //let mywindow = window.open('', qr_src, 'height=800,width=647');
-      let mywindow = window.open('', title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left);
+      let popup;
 
-      mywindow.document.write('<html><head><title>' + document.title  + '</title>');
-      mywindow.document.write('</head><body >');
-      mywindow.document.write('<center><h1>' + title  + '</h1>');
-      mywindow.document.write('<img src="codes/'+qr_src+'"></center>');
-      //mywindow.document.write('<img src="codes/821-B1.png"></center>');
-      mywindow.document.write('</body></html>');
+      function closePrint () {
+          if ( popup ) {
+              popup.close();
+          }
+      }
 
-      mywindow.document.close(); // necessary for IE >= 10
-      mywindow.focus(); // necessary for IE >= 10
-
-      //mywindow.print();
-      //mywindow.close();
-
-      return true;
+    popup = window.open( 'print_qr.php?qr='+qr_src, title,  'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no');
+    popup.onbeforeunload = closePrint;
+    popup.onafterprint = closePrint;
+    popup.focus(); // Required for IE
+    popup.print();
 
   });
   </script>
